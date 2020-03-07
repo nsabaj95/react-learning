@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import {TodoForm,TodoList} from './components/todo'
-import {addTodo,generateId,findById,toggleTodo,updateTodo} from './lib/todoHelpers'
+import {addTodo,generateId,findById,toggleTodo,updateTodo, removeTodo} from './lib/todoHelpers'
+import {partial,pipe} from './lib/utils'
 
 class App extends Component {
   state = {
@@ -15,11 +16,18 @@ class App extends Component {
   }
 
   handleToggle = (id) => {
-    let todo = findById(this.state.todos, id)
-    let updatedTodo = toggleTodo(todo)
-    let updatedList = updateTodo(this.state.todos, updatedTodo)
+    const getUpdatedTodos = pipe(findById, toggleTodo, partial(updateTodo, this.state.todos))
+    let updatedList = getUpdatedTodos(this.state.todos, id)
     this.setState({
       todos: updatedList
+    })
+  }
+
+  handleRemove = (id, evt) => {
+    evt.preventDefault()
+    const updatedTodos = removeTodo(this.state.todos, id)
+    this.setState({
+      todos: updatedTodos
     })
   }
 
@@ -61,7 +69,7 @@ class App extends Component {
       <div className="Todo-App">
         {this.state.errorMessage && <span className='error'>{this.state.errorMessage}</span>}
         <TodoForm handleInputChange={this.handleInputChange} currentTodo={this.state.currentTodo} handleSubmit={submitHandler} />
-        <TodoList handleToggle={this.handleToggle} todos={this.state.todos} />
+        <TodoList handleRemove={this.handleRemove} handleToggle={this.handleToggle} todos={this.state.todos} />
       </div>
     </div>)
   }

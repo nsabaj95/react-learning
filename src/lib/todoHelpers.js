@@ -32,3 +32,12 @@ export const updateTodo = (list, updatedTodo) => {
         ...list.slice(updatedIndex + 1, list.length)
     ]
 }
+
+export const removeTodo = (list, id) => {
+    const removedIndex = list.findIndex(item => item.id === id)
+
+    return [
+        ...list.slice(0, removedIndex),
+        ...list.slice(removedIndex + 1, list.lengq)
+    ]
+}
